@@ -15,7 +15,17 @@ class CreateProductsTable extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->unsignedFloat('price');
+            $table->foreignId('product_category_id');
+            $table->unsignedDecimal('price');
+            $table->unsignedSmallInteger('discount')->default(0);
+            $table->string('title');
+            $table->string('slug');
+            $table->string('thumbnail_url');
+            $table->text('description');
+            $table->text('keywords');
+            $table->boolean('active')->default(true);
+            $table->timestamp('active_since');
+            $table->timestamp('archived_since');
             $table->timestamps();
         });
     }
