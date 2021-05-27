@@ -21,8 +21,11 @@ class RoleFactory extends Factory
      */
     public function definition()
     {
+        $name = $this->faker->words(2, asText: true);
+
         return [
-            //
+            'name' => $name,
+            'alias' => ucwords($name)
         ];
     }
 }

@@ -2,17 +2,17 @@
 
 namespace Database\Factories;
 
-use App\Models\Order;
+use App\Models\OrderStatus;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class OrderFactory extends Factory
+class OrderStatusFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = Order::class;
+    protected $model = OrderStatus::class;
 
     /**
      * Define the model's default state.
@@ -21,8 +21,11 @@ class OrderFactory extends Factory
      */
     public function definition()
     {
+        $name = $this->faker->words(2, asText: true);
+
         return [
-            'user_note' => $this->faker->paragraph()
+            'name' => $name,
+            'alias' => ucwords($name)
         ];
     }
 }
