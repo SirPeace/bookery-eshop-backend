@@ -22,7 +22,9 @@ class ProductCategoryFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'name' => $this->faker->unique()->words(asText: true),
+            'description' => $this->faker->paragraphs(asText: true),
+            'keywords' => $this->faker->words(10, asText: true),
         ];
     }
 }
