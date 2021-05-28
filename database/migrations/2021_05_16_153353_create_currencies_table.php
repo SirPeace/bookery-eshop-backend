@@ -16,7 +16,7 @@ class CreateCurrenciesTable extends Migration
         Schema::create('currencies', function (Blueprint $table) {
             $table->id();
             $table->unsignedDecimal('value');
-            $table->boolean('is_base');
+            $table->boolean('base');
             $table->string('code');
             $table->char('symbol');
             $table->timestamps();
