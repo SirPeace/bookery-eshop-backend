@@ -11,7 +11,7 @@ class UserTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected $user;
+    protected User $user;
 
     public function setUp(): void
     {
@@ -21,7 +21,7 @@ class UserTest extends TestCase
     }
 
     /** @test */
-    public function user_has_role()
+    public function user_belongs_to_role()
     {
         $this->assertInstanceOf(Role::class, $this->user->role);
     }
