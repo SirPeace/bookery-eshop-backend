@@ -21,7 +21,7 @@ class CreateProductsTable extends Migration
             $table->string('title');
             $table->string('slug');
             $table->string('thumbnail_path')->default(
-                'public/product-images/default.png'
+                'public/product-thumbnails/default.png'
             );
             $table->text('description');
             $table->text('keywords');
