@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProductStoreRequest;
+use App\Http\Requests\ProductUpdateRequest;
 use App\Models\Product;
-use Illuminate\Http\Request;
-use App\Http\Requests\StoreProductRequest;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -23,10 +24,10 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\ProductStoreRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreProductRequest $request)
+    public function store(ProductStoreRequest $request)
     {
         $availableFields = [
             'title',
@@ -37,19 +38,19 @@ class ProductController extends Controller
             'keywords',
         ];
 
-        $thumbnail = $request->file('thumbnail');
+        $product = Product::create($request->only($availableFields));
 
-        if ($thumbnail) {
-            $path = $thumbnail->store('/product-thumbnails', 'public');
+        if ($request->hasFile('thumbnail')) {
+            $thumbPath = $request
+                ->file('thumbnail')
+                ->store('/public/product-thumbnails');
 
-            if (!$path) throw new \Exception('Thumbnail was not stored!');
+            if (!$thumbPath) {
+                throw new \Exception('Thumbnail was not stored!');
+            }
+
+            $product->update(['thumbnail_path' => $thumbPath]);
         }
-
-
-        Product::create(array_merge(
-            $request->only($availableFields),
-            ['thumbnail_path' => $path ?? null]
-        ));
 
         return response()->json([
             'status' => 'success'
@@ -68,26 +69,44 @@ class ProductController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \App\Http\Requests\ProductUpdateRequest  $request
+     * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(ProductUpdateRequest $request, Product $product)
     {
-        //
+        $availableFields = [
+            'title',
+            'category_id',
+            'price',
+            'discount',
+            'description',
+            'keywords',
+        ];
+
+        $product->update($request->only($availableFields));
+
+        if ($request->hasFile('thumbnail')) {
+            $defaultPath = 'public/product-thumbnails/default.png';
+
+            if ($product->thumbnail_path !== $defaultPath) {
+                Storage::delete($product->thumbnail_path);
+            }
+
+            $thumbPath = $request
+                ->file('thumbnail')
+                ->store('/public/product-thumbnails');
+
+            if (!$thumbPath) {
+                throw new \Exception('Thumbnail was not stored!');
+            }
+
+            $product->update(['thumbnail_path' => $thumbPath]);
+        }
+
+        return response()->json(['status' => 'success']);
     }
 
     /**
