@@ -62,7 +62,7 @@ class CreateProductTest extends TestCase
             'thumbnail_path' => $thumbnailPath
         ]);
 
-        $this->assertTrue(Storage::exists($thumbnailPath));
+        Storage::assertExists($thumbnailPath);
 
         Storage::delete($thumbnailPath);
     }
