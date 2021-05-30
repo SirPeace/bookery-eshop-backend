@@ -18,7 +18,7 @@ class Product extends Model
         'discount',
         'description',
         'keywords',
-        'thumbnail',
+        'thumbnail_path',
     ];
 
     public function sluggable(): array
