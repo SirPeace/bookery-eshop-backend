@@ -48,7 +48,7 @@ class CreateProductTest extends TestCase
     public function product_can_be_created_with_thumbnail()
     {
         $thumbnail = UploadedFile::fake()->image('thumbnail.png');
-        $thumbnailPath = "product-thumbnails/" . $thumbnail->hashName();
+        $thumbnailPath = "public/product-thumbnails/" . $thumbnail->hashName();
 
         $data = $this->data + ['thumbnail' => $thumbnail];
 
@@ -57,11 +57,14 @@ class CreateProductTest extends TestCase
         $this->postJson(route('products.store'), $data)
             ->assertJson(['status' => 'success']);
 
-        $this->assertDatabaseHas('products', ['title' => 'Product Title']);
+        $this->assertDatabaseHas('products', [
+            'title' => 'Product Title',
+            'thumbnail_path' => $thumbnailPath
+        ]);
 
-        $this->assertTrue(Storage::disk('public')->exists($thumbnailPath));
+        $this->assertTrue(Storage::exists($thumbnailPath));
 
-        Storage::disk('public')->delete($thumbnailPath);
+        Storage::delete($thumbnailPath);
     }
 
     /** @test */
