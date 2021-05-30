@@ -112,11 +112,19 @@ class ProductController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Product $product)
     {
-        //
+        $defaultPath = 'public/product-thumbnails/default.png';
+
+        if ($product->thumbnail_path !== $defaultPath) {
+            Storage::delete($product->thumbnail_path);
+        }
+
+        $product->delete();
+
+        return response()->json(['status' => 'success']);
     }
 }
