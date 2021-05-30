@@ -24,4 +24,13 @@ class GetProductsTest extends TestCase
                 'title' => 'Product two',
             ]);
     }
+
+    /** @test */
+    public function get_product()
+    {
+        $product = Product::factory()->create(['title' => 'Product one']);
+
+        $this->get(route('products.show', compact('product')))
+            ->assertJsonFragment(['title' => 'Product one']);
+    }
 }
