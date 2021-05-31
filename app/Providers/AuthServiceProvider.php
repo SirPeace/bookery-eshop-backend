@@ -2,9 +2,12 @@
 
 namespace App\Providers;
 
-use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use App\Models\User;
+use App\Models\Product;
+use App\Policies\ProductPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -14,7 +17,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        // 'App\Models\Model' => 'App\Policies\ModelPolicy',
+        Product::class => ProductPolicy::class,
     ];
 
     /**
@@ -24,6 +27,12 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        Gate::before(function (User $user) {
+            if ($user->role->name === 'admin') {
+                return true;
+            }
+        });
+
         $this->registerPolicies();
 
         ResetPassword::createUrlUsing(function ($user, string $token) {

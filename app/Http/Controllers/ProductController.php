@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\ProductStoreRequest;
 use App\Http\Requests\ProductUpdateRequest;
-use App\Models\Product;
-use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -29,6 +30,8 @@ class ProductController extends Controller
      */
     public function store(ProductStoreRequest $request)
     {
+        $this->authorize('create', Product::class);
+
         $availableFields = [
             'title',
             'category_id',
@@ -77,6 +80,8 @@ class ProductController extends Controller
      */
     public function update(ProductUpdateRequest $request, Product $product)
     {
+        $this->authorize('update', $product);
+
         $availableFields = [
             'title',
             'category_id',
@@ -117,6 +122,8 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
+        $this->authorize('delete', $product);
+
         $defaultPath = 'public/product-thumbnails/default.png';
 
         if ($product->thumbnail_path !== $defaultPath) {

@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Product;
 
-use App\Models\Product;
 use Tests\TestCase;
 use App\Models\ProductCategory;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -19,6 +19,10 @@ class CreateProductTest extends TestCase
     {
         parent::setUp();
 
+        $this->admin = User::factory()->create([
+            'role_id' => Role::factory()->create(['name' => 'admin'])
+        ]);
+
         $this->data = [
             'title' => 'Product Title',
             'category_id' => ProductCategory::factory()->create()->id,
@@ -32,7 +36,7 @@ class CreateProductTest extends TestCase
     /** @test */
     public function product_can_be_created()
     {
-        $this->actingAs(User::factory()->create());
+        $this->actingAs($this->admin);
 
         $this->postJson(route('products.store'), $this->data)
             ->assertJson(['status' => 'success']);
@@ -52,7 +56,7 @@ class CreateProductTest extends TestCase
 
         $data = $this->data + ['thumbnail' => $thumbnail];
 
-        $this->actingAs(User::factory()->create());
+        $this->actingAs($this->admin);
 
         $this->postJson(route('products.store'), $data)
             ->assertJson(['status' => 'success']);
@@ -80,7 +84,7 @@ class CreateProductTest extends TestCase
             ]
         );
 
-        $this->actingAs(User::factory()->create());
+        $this->actingAs($this->admin);
 
         $this->postJson(route('products.store'), $invalidData)
             ->assertJson([
@@ -100,6 +104,18 @@ class CreateProductTest extends TestCase
                     ],
                 ]
             ]);
+
+        $this->assertDatabaseMissing('products', ['title' => 'short']);
+    }
+
+    /** @test */
+    public function product_is_not_created_if_user_is_unauthorized()
+    {
+        $this->actingAs(User::factory()->create());
+
+        $this->postJson(route('products.store'), $this->data)
+            ->assertStatus(403)
+            ->assertJson(['message' => 'This action is unauthorized.']);
 
         $this->assertDatabaseMissing('products', ['title' => 'Product Title']);
     }

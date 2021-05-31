@@ -3,15 +3,26 @@
 namespace Tests\Feature\Product;
 
 use Tests\TestCase;
+use App\Models\Role;
+use App\Models\User;
 use App\Models\Product;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\UploadedFile;
 
 class DeleteProductTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->admin = User::factory()->create([
+            'role_id' => Role::factory()->create(['name' => 'admin'])
+        ]);
+    }
 
     /** @test */
     public function product_can_be_deleted()
@@ -19,6 +30,8 @@ class DeleteProductTest extends TestCase
         $product = Product::factory()->create();
 
         $this->assertDatabaseCount('products', 1);
+
+        $this->actingAs($this->admin);
 
         $this->deleteJson(route('products.destroy', compact('product')))
             ->assertJson(['status' => 'success']);
@@ -39,11 +52,30 @@ class DeleteProductTest extends TestCase
             'public/product-thumbnails/' . $thumbnail->hashName()
         );
 
+        $this->actingAs($this->admin);
+
         $this->deleteJson(route('products.destroy', compact('product')))
             ->assertJson(['status' => 'success']);
 
         Storage::assertMissing(
             'public/product-thumbnails/' . $thumbnail->hashName()
         );
+    }
+
+    /** @test */
+    public function product_is_not_deleted_if_user_is_unauthorized()
+    {
+        $product = Product::factory()->create();
+
+        $this->actingAs(User::factory()->create());
+
+        $this->deleteJson(
+            route('products.destroy', compact('product')),
+            ['title' => 'Updated Product']
+        )
+            ->assertStatus(403)
+            ->assertJson(['message' => 'This action is unauthorized.']);
+
+        $this->assertDatabaseHas('products', ['title' => $product->title]);
     }
 }
