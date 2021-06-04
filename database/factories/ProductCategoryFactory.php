@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\ProductCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 class ProductCategoryFactory extends Factory
 {
@@ -21,8 +22,11 @@ class ProductCategoryFactory extends Factory
      */
     public function definition()
     {
+        $name = $this->faker->unique()->words(asText: true);
+
         return [
-            'name' => $this->faker->unique()->words(asText: true),
+            'name' => ucwords($name),
+            'slug' => Str::slug($name),
             'description' => $this->faker->paragraphs(asText: true),
             'keywords' => $this->faker->words(10, asText: true),
         ];

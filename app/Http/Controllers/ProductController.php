@@ -32,16 +32,7 @@ class ProductController extends Controller
     {
         $this->authorize('create', Product::class);
 
-        $availableFields = [
-            'title',
-            'category_id',
-            'price',
-            'discount',
-            'description',
-            'keywords',
-        ];
-
-        $product = Product::create($request->only($availableFields));
+        $product = Product::create($request->all());
 
         if ($request->hasFile('thumbnail')) {
             $thumbPath = $request
@@ -82,16 +73,7 @@ class ProductController extends Controller
     {
         $this->authorize('update', $product);
 
-        $availableFields = [
-            'title',
-            'category_id',
-            'price',
-            'discount',
-            'description',
-            'keywords',
-        ];
-
-        $product->update($request->only($availableFields));
+        $product->update($request->all());
 
         if ($request->hasFile('thumbnail')) {
             $defaultPath = 'public/product-thumbnails/default.png';

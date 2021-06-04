@@ -22,10 +22,19 @@ class ProductFactory extends Factory
      */
     public function definition()
     {
+        $oldPrice = $this->faker->randomFloat(2, min: 10, max: 10000);
+        $price = $this->faker->randomFloat(
+            nbMaxDecimals: 2,
+            min: $oldPrice * 0.35,
+            max: $oldPrice * 0.9
+        );
+        $discount = intval((1 - $price / $oldPrice) * 100);
+
         return [
-            'price' => $this->faker->randomFloat(2, max: 10000),
+            'price' => $price,
+            'old_price' => $oldPrice,
             'category_id' => ProductCategory::factory(),
-            'discount' => $this->faker->randomNumber(2),
+            'discount' => $discount,
             'title' => $this->faker->words(asText: true),
             'description' => $this->faker->paragraphs(asText: true),
             'keywords' => $this->faker->words(10, asText: true),

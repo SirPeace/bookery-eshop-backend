@@ -23,11 +23,20 @@ class CreateProductTest extends TestCase
             'role_id' => Role::factory()->create(['name' => 'admin'])
         ]);
 
+        $oldPrice = $this->faker->randomFloat(2, min: 10, max: 10000);
+        $price = $this->faker->randomFloat(
+            nbMaxDecimals: 2,
+            min: $oldPrice * 0.35,
+            max: $oldPrice * 0.9
+        );
+        $discount = intval((1 - $price / $oldPrice) * 100);
+
         $this->data = [
             'title' => 'Product Title',
             'category_id' => ProductCategory::factory()->create()->id,
-            'price' => $this->faker->randomFloat(2, max: 10000),
-            'discount' => $this->faker->numberBetween(0, 75),
+            'old_price' => $oldPrice,
+            'price' => $price,
+            'discount' => $discount,
             'description' => $this->faker->paragraphs(asText: true),
             'keywords' => json_encode($this->faker->words(10)),
         ];
