@@ -7,7 +7,6 @@ use App\Models\User;
 use App\Models\Order;
 use App\Models\OrderStatus;
 use App\Models\Product;
-use App\Models\ProductCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class OrderTest extends TestCase
