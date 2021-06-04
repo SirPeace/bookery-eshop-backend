@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Roman Khabibulin',
             'email' => 'roman.khabibulin12@gmail.com',
             'password' => Hash::make('admin'),
-            'role_id' => Role::where('name', 'admin')->first()->id,
+            'role_id' => Role::where('slug', 'admin')->first()->id,
         ]);
     }
 }
