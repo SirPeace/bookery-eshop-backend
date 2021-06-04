@@ -14,9 +14,11 @@ class CreateOrderProduct extends Migration
     public function up()
     {
         Schema::create('order_product', function (Blueprint $table) {
-            $table->foreignId('order_id');
-            $table->foreignId('product_id');
+            $table->foreignId('order_id')->constrained();
+            $table->foreignId('product_id')->constrained();
+            $table->unsignedDecimal('old_price');
             $table->unsignedDecimal('price');
+            $table->unsignedInteger('discount');
             $table->string('product_title');
         });
     }

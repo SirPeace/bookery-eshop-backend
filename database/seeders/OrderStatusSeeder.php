@@ -16,16 +16,16 @@ class OrderStatusSeeder extends Seeder
     {
         OrderStatus::factory()->createMany([
             [
-                'name' => 'active',
-                'alias' => 'Active',
+                'slug' => 'active',
+                'name' => 'Active',
             ],
             [
-                'name' => 'archived',
-                'alias' => 'Archived',
+                'slug' => 'archived',
+                'name' => 'Archived',
             ],
             [
-                'name' => 'out-of-stock',
-                'alias' => 'Out of stock',
+                'slug' => 'out-of-stock',
+                'name' => 'Out of stock',
             ],
         ]);
     }

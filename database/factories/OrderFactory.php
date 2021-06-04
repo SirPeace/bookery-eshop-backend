@@ -25,9 +25,15 @@ class OrderFactory extends Factory
     public function definition()
     {
         return [
-            'user_note' => $this->faker->paragraph(),
             'status_id' => OrderStatus::factory(),
             'user_id' => User::factory(),
+            'customer_name' => $this->faker->name,
+            'customer_email' => $this->faker->email,
+            'customer_phone' => $this->faker->phoneNumber,
+            'address' => $this->faker->streetAddress,
+            'city' => $this->faker->city,
+            'postcode' => $this->faker->postcode,
+            'customer_note' => $this->faker->paragraph(),
         ];
     }
 }

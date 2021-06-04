@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\OrderStatus;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class OrderStatusFactory extends Factory
@@ -24,8 +25,8 @@ class OrderStatusFactory extends Factory
         $name = $this->faker->words(2, asText: true);
 
         return [
-            'name' => $name,
-            'alias' => ucwords($name)
+            'slug' => Str::slug($name),
+            'name' => ucwords($name)
         ];
     }
 }

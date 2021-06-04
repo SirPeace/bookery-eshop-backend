@@ -25,7 +25,12 @@ class OrderTest extends TestCase
             ->for(OrderStatus::factory(), 'status')
             ->hasAttached(
                 Product::factory()->count(3),
-                ['price' => 1000, 'product_title' => 'Random title']
+                [
+                    'product_title' => 'Random title',
+                    'old_price' => 1000,
+                    'price' => 800,
+                    'discount' => 20,
+                ]
             )
             ->create();
     }
