@@ -52,7 +52,12 @@ class OrderController extends Controller
             ]);
         }
 
-        return response()->json(['status' => 'success']);
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'order' => $order,
+            ]
+        ]);
     }
 
     /**
