@@ -1,9 +1,10 @@
 <?php
 
-use App\Actions\Fortify\CreateNewUser;
-use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Actions\Fortify\CreateNewUser;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,3 +23,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::resource('products', ProductController::class)
     ->scoped(['product' => 'slug']);
+
+Route::resource('orders', OrderController::class);
