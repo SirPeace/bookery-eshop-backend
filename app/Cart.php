@@ -15,7 +15,7 @@ class Cart
 
     private User $user;
     private Collection $products;
-    private string $redisHash;
+    private string $hash;
 
     public function __construct()
     {
@@ -27,7 +27,7 @@ class Cart
 
         $this->user = auth()->user();
 
-        $this->redisHash = env('APP_ENV') === 'testing'
+        $this->hash = env('APP_ENV') === 'testing'
             ? "cart:test:{$this->user->id}"
             : "cart:{$this->user->id}";
     }
@@ -44,11 +44,11 @@ class Cart
             return $this->products;
         }
 
-        $products = Product::whereIn('id', Redis::hkeys($this->redisHash))
+        $products = Product::whereIn('id', Redis::hkeys($this->hash))
             ->get();
 
         foreach ($products as $product) {
-            $product->count = Redis::hget($this->redisHash, $product->id);
+            $product->count = Redis::hget($this->hash, $product->id);
         }
 
         $this->products = $products;
@@ -66,8 +66,8 @@ class Cart
     public function addProduct(Product $product, int $quantity = 1): void
     {
         $productQuantity =
-            array_key_exists($product->id, Redis::hkeys($this->redisHash))
-            ? Redis::hget($this->redisHash, $product->id) + $quantity
+            array_key_exists($product->id, Redis::hkeys($this->hash))
+            ? Redis::hget($this->hash, $product->id) + $quantity
             : $quantity;
 
         $product->count = $productQuantity;
@@ -76,16 +76,43 @@ class Cart
             $this->products[] = $product;
         }
 
-        Redis::hset($this->redisHash, $product->id, $productQuantity);
+        Redis::hset($this->hash, $product->id, $productQuantity);
     }
 
+    /**
+     * Remove product from the cart
+     *
+     * @param Product $product
+     * @param int $quantity
+     * @return void
+     */
     public function removeProduct(Product $product): void
     {
         if (!empty($this->products)) {
             $this->products->filter(fn ($item) => $item->id != $product->id);
         }
 
-        Redis::hdel($this->redisHash, $product->id);
+        Redis::hdel($this->hash, $product->id);
+    }
+
+    /**
+     * Check if cart is empty
+     *
+     * @return boolean
+     */
+    public function isEmpty(): bool
+    {
+        return $this->getProducts()->isEmpty();
+    }
+
+    /**
+     * Clear the cart (destroy the hash)
+     *
+     * @return void
+     */
+    public function clear(): void
+    {
+        Redis::del($this->hash);
     }
 
     /**
@@ -95,6 +122,6 @@ class Cart
      */
     public function getCart(): array
     {
-        return Redis::hgetall($this->redisHash);
+        return Redis::hgetall($this->hash);
     }
 }
