@@ -16,16 +16,19 @@ class RoleSeeder extends Seeder
     {
         Role::factory()->createMany([
             [
+                'id'   => 1,
+                'slug' => 'customer',
+                'name' => 'Customer',
+            ],
+            [
+                'id'   => 2,
                 'slug' => 'admin',
                 'name' => 'Administrator',
             ],
             [
+                'id'   => 3,
                 'slug' => 'manager',
                 'name' => 'Manager',
-            ],
-            [
-                'slug' => 'customer',
-                'name' => 'Customer',
             ],
         ]);
     }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\OrderStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -19,14 +20,16 @@ class CreateOrdersTable extends Migration
                 ->nullable()
                 ->constrained()
                 ->onDelete('set null');
-            $table->foreignId('status_id')->constrained('order_statuses');
+            $table->foreignId('status_id')
+                ->default(1)
+                ->constrained('order_statuses');
             $table->string('customer_name');
             $table->string('customer_email');
             $table->string('customer_phone')->nullable();
             $table->string('address');
             $table->string('city');
             $table->string('postcode');
-            $table->text('customer_note');
+            $table->text('customer_note')->nullable();
             $table->timestamps();
         });
     }
