@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Product;
 use App\Models\OrderStatus;
 use App\Exceptions\EmptyCartException;
+use App\Models\Order;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -40,13 +41,19 @@ class CreateOrderTest extends TestCase
     /** @test */
     public function can_create_order()
     {
-        $this->actingAs(User::factory()->create());
+        $user = User::factory()->create();
+        $this->actingAs($user);
 
         $cart = new Cart();
         $cart->addProduct(Product::factory()->create());
 
         $this->postJson(route('orders.store'), $this->data)
-            ->assertJson(['status' => 'success']);
+            ->assertJson([
+                'status' => 'success',
+                'data' => [
+                    'order' => $this->data,
+                ]
+            ]);
 
         $this->assertDatabaseHas('orders', ['user_id' => $this->admin->id]);
     }
@@ -110,8 +117,9 @@ class CreateOrderTest extends TestCase
         $cart->addProduct($productOne);
         $cart->addProduct($productTwo, 2);
 
-        $this->postJson(route('orders.store'), $this->data)
-            ->assertSuccessful();
+        $response = $this->postJson(route('orders.store'), $this->data)
+            ->assertSuccessful()
+            ->json();
 
         $this->assertDatabaseHas('order_product', [
             'product_id' => $productOne->id,
@@ -128,5 +136,12 @@ class CreateOrderTest extends TestCase
             'discount' => 25,
             'product_count' => 2,
         ]);
+
+        $order = Order::find($response['data']['order']['id']);
+
+        $this->assertTrue(
+            $order->products->contains($productOne) &&
+            $order->products->contains($productTwo)
+        );
     }
 }
