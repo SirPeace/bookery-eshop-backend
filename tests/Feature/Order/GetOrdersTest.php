@@ -95,4 +95,38 @@ class GetOrdersTest extends TestCase
             ->getJson(route('orders.index'))
             ->assertJsonCount(1, "data.orders");
     }
+
+    /** @test */
+    public function authorized_user_can_get_specific_order()
+    {
+        $user = User::factory()->create();
+
+        $order = Order::factory()
+            ->hasAttached(
+                $product = Product::factory()->create(),
+                [
+                    'product_title' => $product->title,
+                    'old_price' => $product->old_price,
+                    'price' => $product->price,
+                    'discount' => $product->discount,
+                    'product_count' => 1,
+                ]
+            )
+            ->create([
+                'user_id' => $user->id
+            ]);
+
+        $this->actingAs($user)
+            ->getJson(route('orders.show', compact('order')))
+            ->assertJson([
+                'status' => 'success',
+                'data' => [
+                    'order' => [
+                        'user_id' => $user->id,
+                        'address' => $order->address,
+                        'customer_name' => $order->customer_name,
+                    ]
+                ]
+            ]);
+    }
 }

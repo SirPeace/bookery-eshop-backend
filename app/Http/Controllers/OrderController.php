@@ -81,7 +81,12 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
-        //
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'order' => $order,
+            ]
+        ]);
     }
 
     /**
