@@ -13,18 +13,15 @@ class GetProductsTest extends TestCase
     /** @test */
     public function get_all_products()
     {
-        $products = Product::factory()->createMany([
-            ['title' => 'Product one'],
-            ['title' => 'Product two'],
-        ]);
+        [$productOne, $productTwo] = Product::factory(2)->create();
 
         $this->get(route('products.index'))
             ->assertJson([
                 'status' => 'success',
                 'data'   => [
                     'products' => [
-                        ['title' => 'Product one'],
-                        ['title' => 'Product two']
+                        ['title' => $productOne->title],
+                        ['title' => $productTwo->title]
                     ]
                 ]
             ]);

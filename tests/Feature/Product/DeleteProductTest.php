@@ -20,7 +20,7 @@ class DeleteProductTest extends TestCase
         parent::setUp();
 
         $this->admin = User::factory()->create([
-            'role_id' => Role::factory()->create(['name' => 'admin'])
+            'role_id' => Role::factory()->create(['slug' => 'admin'])
         ]);
     }
 
@@ -66,13 +66,10 @@ class DeleteProductTest extends TestCase
         $product = Product::factory()->create();
 
         $this->actingAs(User::factory()->create())
-            ->deleteJson(
-                route('products.destroy', compact('product')),
-                ['title' => 'Updated Product']
-            )
+            ->deleteJson(route('products.destroy', compact('product')))
             ->assertStatus(403)
             ->assertJson(['message' => 'This action is unauthorized.']);
 
-        $this->assertDatabaseHas('products', ['title' => $product->title]);
+        $this->assertDatabaseHas('products', ['id' => $product->id]);
     }
 }
