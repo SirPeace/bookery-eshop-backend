@@ -18,8 +18,7 @@ class OrderPolicy
      */
     public function viewAny(User $user)
     {
-        return $user->role->slug === 'admin'
-            || $user->role->slug === 'manager';
+        return true;
     }
 
     /**

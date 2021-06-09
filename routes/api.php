@@ -22,6 +22,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::resource('products', ProductController::class)
-    ->scoped(['product' => 'slug']);
+    ->scoped(['product' => 'slug'])
+    ->except(['create', 'edit']);
 
-Route::resource('orders', OrderController::class);
+Route::resource('orders', OrderController::class)
+    ->except(['create', 'edit']);

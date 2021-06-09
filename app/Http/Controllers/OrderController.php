@@ -23,7 +23,20 @@ class OrderController extends Controller
      */
     public function index()
     {
-        //
+        $user = auth()->user();
+
+        if ($user->role->slug === 'admin' || $user->role->slug === 'manager') {
+            $orders = Order::all();
+        } else {
+            $orders = Order::where('user_id', $user->id)->get();
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => [
+                'orders' => $orders
+            ]
+        ]);
     }
 
     /**
