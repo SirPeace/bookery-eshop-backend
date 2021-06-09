@@ -52,7 +52,10 @@ class ProductController extends Controller
         }
 
         return response()->json([
-            'status' => 'success'
+            'status' => 'success',
+            'data'   => [
+                'product' => $product
+            ]
         ]);
     }
 
@@ -103,7 +106,12 @@ class ProductController extends Controller
             $product->update(['thumbnail_path' => $thumbPath]);
         }
 
-        return response()->json(['status' => 'success']);
+        return response()->json([
+            'status' => 'success',
+            'data'   => [
+                'product' => $product
+            ]
+        ]);
     }
 
     /**

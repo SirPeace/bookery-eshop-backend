@@ -47,9 +47,14 @@ class CreateProductTest extends TestCase
     {
         $this->actingAs($this->admin)
             ->postJson(route('products.store'), $this->data)
-            ->assertJson(['status' => 'success']);
+            ->assertJson([
+                'status' => 'success',
+                'data'   => [
+                    'product' => $this->data
+                ]
+            ]);
 
-        $this->assertDatabaseHas('products', ['title' => 'Product Title']);
+        $this->assertDatabaseHas('products', $this->data);
         $this->assertDatabaseHas(
             'products',
             ['thumbnail_path' => 'public/product-thumbnails/default.png']

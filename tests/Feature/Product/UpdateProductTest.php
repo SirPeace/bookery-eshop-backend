@@ -28,28 +28,29 @@ class UpdateProductTest extends TestCase
     /** @test */
     public function product_can_be_updated()
     {
-        $this->actingAs($this->admin)
-            ->patchJson(
-                route('products.update', ['product' => $this->product]),
-                [
-                    'title' => 'Updated Product',
-                    'price' => 5000,
-                    'discount' => 20,
-                    'description' => 'Very long and interesting text',
-                    'keywords' => json_encode([
-                        'interesting', 'keywords', 'here'
-                    ]),
-                ]
-            )
-            ->assertJson(['status' => 'success']);
-
-        $this->assertDatabaseHas('products', [
+        $updatedFields = [
             'title' => 'Updated Product',
             'price' => 5000,
             'discount' => 20,
             'description' => 'Very long and interesting text',
-            'keywords' => json_encode(['interesting', 'keywords', 'here'])
-        ]);
+            'keywords' => json_encode([
+                'interesting', 'keywords', 'here'
+            ]),
+        ];
+
+        $this->actingAs($this->admin)
+            ->patchJson(
+                route('products.update', ['product' => $this->product]),
+                $updatedFields
+            )
+            ->assertJson([
+                'status' => 'success',
+                'data'   => [
+                    'product' => $updatedFields
+                ]
+            ]);
+
+        $this->assertDatabaseHas('products', $updatedFields);
     }
 
     /** @test */
