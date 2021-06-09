@@ -13,15 +13,20 @@ class GetProductsTest extends TestCase
     /** @test */
     public function get_all_products()
     {
-        Product::factory()->createMany([
+        $products = Product::factory()->createMany([
             ['title' => 'Product one'],
             ['title' => 'Product two'],
         ]);
 
         $this->get(route('products.index'))
-            ->assertJsonFragment([
-                'title' => 'Product one',
-                'title' => 'Product two',
+            ->assertJson([
+                'status' => 'success',
+                'data'   => [
+                    'products' => [
+                        ['title' => 'Product one'],
+                        ['title' => 'Product two']
+                    ]
+                ]
             ]);
     }
 
@@ -31,6 +36,13 @@ class GetProductsTest extends TestCase
         $product = Product::factory()->create(['title' => 'Product one']);
 
         $this->get(route('products.show', compact('product')))
-            ->assertJsonFragment(['title' => 'Product one']);
+            ->assertJson([
+                'status' => 'success',
+                'data'   => [
+                    'product' => [
+                        'title' => 'Product one'
+                    ]
+                ]
+            ]);
     }
 }
