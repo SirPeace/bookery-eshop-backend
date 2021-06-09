@@ -31,9 +31,8 @@ class DeleteProductTest extends TestCase
 
         $this->assertDatabaseCount('products', 1);
 
-        $this->actingAs($this->admin);
-
-        $this->deleteJson(route('products.destroy', compact('product')))
+        $this->actingAs($this->admin)
+            ->deleteJson(route('products.destroy', compact('product')))
             ->assertJson(['status' => 'success']);
 
         $this->assertDatabaseCount('products', 0);
@@ -52,9 +51,8 @@ class DeleteProductTest extends TestCase
             'public/product-thumbnails/' . $thumbnail->hashName()
         );
 
-        $this->actingAs($this->admin);
-
-        $this->deleteJson(route('products.destroy', compact('product')))
+        $this->actingAs($this->admin)
+            ->deleteJson(route('products.destroy', compact('product')))
             ->assertJson(['status' => 'success']);
 
         Storage::assertMissing(
@@ -67,12 +65,11 @@ class DeleteProductTest extends TestCase
     {
         $product = Product::factory()->create();
 
-        $this->actingAs(User::factory()->create());
-
-        $this->deleteJson(
-            route('products.destroy', compact('product')),
-            ['title' => 'Updated Product']
-        )
+        $this->actingAs(User::factory()->create())
+            ->deleteJson(
+                route('products.destroy', compact('product')),
+                ['title' => 'Updated Product']
+            )
             ->assertStatus(403)
             ->assertJson(['message' => 'This action is unauthorized.']);
 

@@ -61,10 +61,10 @@ class CreateOrderTest extends TestCase
     /** @test */
     public function order_is_not_created_if_validation_fails()
     {
-        $this->actingAs(User::factory()->create());
         $invalidData = array_merge($this->data, ['customer_name' => '']);
 
-        $this->postJson(route('orders.store'), $invalidData)
+        $this->actingAs(User::factory()->create())
+            ->postJson(route('orders.store'), $invalidData)
             ->assertJson([
                 'message' => 'The given data was invalid.',
                 'errors' => [

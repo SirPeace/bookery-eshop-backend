@@ -45,9 +45,8 @@ class CreateProductTest extends TestCase
     /** @test */
     public function product_can_be_created()
     {
-        $this->actingAs($this->admin);
-
-        $this->postJson(route('products.store'), $this->data)
+        $this->actingAs($this->admin)
+            ->postJson(route('products.store'), $this->data)
             ->assertJson(['status' => 'success']);
 
         $this->assertDatabaseHas('products', ['title' => 'Product Title']);
@@ -65,9 +64,8 @@ class CreateProductTest extends TestCase
 
         $data = $this->data + ['thumbnail' => $thumbnail];
 
-        $this->actingAs($this->admin);
-
-        $this->postJson(route('products.store'), $data)
+        $this->actingAs($this->admin)
+            ->postJson(route('products.store'), $data)
             ->assertJson(['status' => 'success']);
 
         $this->assertDatabaseHas('products', [
@@ -93,9 +91,8 @@ class CreateProductTest extends TestCase
             ]
         );
 
-        $this->actingAs($this->admin);
-
-        $this->postJson(route('products.store'), $invalidData)
+        $this->actingAs($this->admin)
+            ->postJson(route('products.store'), $invalidData)
             ->assertJson([
                 'message' => 'The given data was invalid.',
                 'errors' => [
@@ -120,9 +117,8 @@ class CreateProductTest extends TestCase
     /** @test */
     public function product_is_not_created_if_user_is_unauthorized()
     {
-        $this->actingAs(User::factory()->create());
-
-        $this->postJson(route('products.store'), $this->data)
+        $this->actingAs(User::factory()->create())
+            ->postJson(route('products.store'), $this->data)
             ->assertStatus(403)
             ->assertJson(['message' => 'This action is unauthorized.']);
 
