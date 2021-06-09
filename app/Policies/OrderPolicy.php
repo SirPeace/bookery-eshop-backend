@@ -30,8 +30,7 @@ class OrderPolicy
      */
     public function view(User $user, Order $order)
     {
-        return $user->role->slug === 'admin'
-            || $user->role->slug === 'manager'
+        return in_array($user->role->slug, ['admin', 'manager'])
             || $user->orders->contains($order);
     }
 
@@ -55,8 +54,7 @@ class OrderPolicy
      */
     public function update(User $user, Order $order)
     {
-        return $user->role->slug === 'admin'
-            || $user->role->slug === 'manager';
+        return in_array($user->role->slug, ['admin', 'manager']);
     }
 
     /**
