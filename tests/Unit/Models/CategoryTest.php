@@ -3,21 +3,21 @@
 namespace Tests\Unit\Models;
 
 use Tests\TestCase;
-use App\Models\ProductCategory;
+use App\Models\Category;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class ProductCategoryTest extends TestCase
+class CategoryTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected ProductCategory $category;
+    protected Category $category;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->category = ProductCategory::factory()
-            ->for(ProductCategory::factory(), 'parent')
+        $this->category = Category::factory()
+            ->for(Category::factory(), 'parent')
             ->create();
     }
 
@@ -25,7 +25,7 @@ class ProductCategoryTest extends TestCase
     public function order_belongs_to_parent_order()
     {
         $this->assertInstanceOf(
-            ProductCategory::class,
+            Category::class,
             $this->category->parent
         );
     }

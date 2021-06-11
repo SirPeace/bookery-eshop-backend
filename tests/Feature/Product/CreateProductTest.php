@@ -3,7 +3,7 @@
 namespace Tests\Feature\Product;
 
 use Tests\TestCase;
-use App\Models\ProductCategory;
+use App\Models\Category;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
@@ -33,7 +33,7 @@ class CreateProductTest extends TestCase
 
         $this->data = [
             'title' => 'Product Title',
-            'category_id' => ProductCategory::factory()->create()->id,
+            'category_id' => Category::factory()->create()->id,
             'old_price' => $oldPrice,
             'price' => $price,
             'discount' => $discount,

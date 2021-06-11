@@ -15,7 +15,7 @@ class ProductUpdateRequest extends FormRequest
     {
         return [
             'title' => 'string|min:10',
-            'category_id' => 'integer|exists:product_categories,id',
+            'category_id' => 'integer|exists:categories,id',
             'price' => 'numeric|min:0',
             'discount' => 'numeric|min:0|max:75',
             'description' => 'string|min:30',

@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Product;
-use App\Models\ProductCategory;
+use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ProductFactory extends Factory
@@ -33,7 +33,7 @@ class ProductFactory extends Factory
         return [
             'price' => $price,
             'old_price' => $oldPrice,
-            'category_id' => ProductCategory::factory(),
+            'category_id' => Category::factory(),
             'discount' => $discount,
             'title' => $this->faker->words(asText: true),
             'description' => $this->faker->paragraphs(asText: true),

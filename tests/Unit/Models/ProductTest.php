@@ -4,7 +4,7 @@ namespace Tests\Unit\Models;
 
 use Tests\TestCase;
 use App\Models\Product;
-use App\Models\ProductCategory;
+use App\Models\Category;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ProductTest extends TestCase
@@ -18,7 +18,7 @@ class ProductTest extends TestCase
         parent::setUp();
 
         $this->product = Product::factory()
-            ->for(ProductCategory::factory(), 'category')
+            ->for(Category::factory(), 'category')
             ->create();
     }
 
@@ -26,7 +26,7 @@ class ProductTest extends TestCase
     public function product_belongs_to_category()
     {
         $this->assertInstanceOf(
-            ProductCategory::class,
+            Category::class,
             $this->product->category
         );
     }
