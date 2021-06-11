@@ -25,7 +25,7 @@ class CategoryFactory extends Factory
         $name = $this->faker->unique()->words(asText: true);
 
         return [
-            'name' => ucwords($name),
+            'title' => ucwords($name),
             'slug' => Str::slug($name),
             'description' => $this->faker->paragraphs(asText: true),
             'keywords' => $this->faker->words(10, asText: true),
