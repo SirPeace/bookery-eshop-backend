@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Models;
 
+use App\Models\Attribute;
 use Tests\TestCase;
 use App\Models\Product;
 use App\Models\Category;
@@ -18,7 +19,8 @@ class ProductTest extends TestCase
         parent::setUp();
 
         $this->product = Product::factory()
-            ->for(Category::factory(), 'category')
+            ->for(Category::factory())
+            ->has(Attribute::factory())
             ->create();
     }
 
@@ -28,6 +30,15 @@ class ProductTest extends TestCase
         $this->assertInstanceOf(
             Category::class,
             $this->product->category
+        );
+    }
+
+    /** @test */
+    public function belongs_to_many_attributes()
+    {
+        $this->assertContainsOnlyInstancesOf(
+            Attribute::class,
+            $this->product->attributes
         );
     }
 }
