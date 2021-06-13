@@ -2,12 +2,16 @@
 
 namespace Tests\Feature\Product;
 
+use Tests\TestCase;
+use App\Models\Role;
+use App\Models\User;
+use App\Models\Product;
+use App\Models\Category;
 use App\Models\Attribute;
 use App\Models\AttributeGroup;
-use App\Models\Category;
-use App\Models\Product;
+use Illuminate\Http\Testing\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
 class GetProductsTest extends TestCase
 {
@@ -131,6 +135,70 @@ class GetProductsTest extends TestCase
     }
 
     /** @test */
+    public function can_filter_products_by_price_range()
+    {
+        Product::factory()->createMany([
+            ['price' => 500],
+            ['price' => 1000],
+            ['price' => 2000],
+            ['price' => 3000],
+        ]);
+
+        $this->get(route(
+            'products.index',
+            [
+                'min_price' => 1000,
+                'max_price' => 2000
+            ]
+        ))
+            ->assertJsonCount(2, 'data.products.data')
+            ->assertJson([
+                'data' => [
+                    'products' => [
+                        'data' => [
+                            ['price' => 1000],
+                            ['price' => 2000],
+                        ]
+                    ]
+                ]
+            ]);
+    }
+
+    /** @test */
+    public function can_filter_products_by_thumbnail_presence()
+    {
+        Product::factory()->create();
+
+        $thumbnailPath = File::fake()
+            ->image('thumbnail.png')
+            ->store('product-thumbnails', ['disk' => 'public']);
+
+        $product = Product::factory()->create([
+            'thumbnail_path' => $thumbnailPath
+        ]);
+
+        $this->get(route(
+            'products.index',
+            ['with_thumbnail' => true]
+        ))
+            ->assertJsonCount(1, 'data.products.data')
+            ->assertJson([
+                'data' => [
+                    'products' => [
+                        'data' => [
+                            [
+                                'id' => $product->id,
+                                'thumbnail_path' => $thumbnailPath
+                            ],
+                        ]
+                    ]
+                ]
+            ]);
+
+        Storage::delete($thumbnailPath);
+    }
+
+    /** @test */
     public function can_filter_products_by_single_attribute()
     {
         Product::factory(2)->create();
@@ -159,6 +227,32 @@ class GetProductsTest extends TestCase
                         ]
                     ]
                 ]
+            ]);
+    }
+
+    /** @test */
+    public function authorized_user_can_fetch_archived_products()
+    {
+        $admin = User::factory()->create([
+            'role_id' => Role::factory()->create(['slug' => 'admin'])
+        ]);
+        Product::factory(2)->create();
+        $archivedProduct = Product::factory()->create(['active' => false]);
+
+        $this->actingAs($admin)
+            ->getJson(route('products.index'))
+            ->assertJsonCount(3, 'data.products.data')
+            ->assertJsonFragment([
+                "id"   => $archivedProduct->id,
+                "slug" => $archivedProduct->slug,
+            ]);
+
+        $this->actingAs(User::factory()->create())
+            ->getJson(route('products.index'))
+            ->assertJsonCount(2, 'data.products.data')
+            ->assertJsonMissing([
+                "id"   => $archivedProduct->id,
+                "slug" => $archivedProduct->slug,
             ]);
     }
 }
