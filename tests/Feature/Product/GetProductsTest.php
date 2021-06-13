@@ -255,4 +255,35 @@ class GetProductsTest extends TestCase
                 "slug" => $archivedProduct->slug,
             ]);
     }
+
+    /** @test */
+    public function products_can_be_sorted_by_price()
+    {
+        Product::factory()->createMany([
+            ['price' => 3000],
+            ['price' => 500],
+            ['price' => 2000],
+            ['price' => 1000],
+        ]);
+
+        $this->getJson(route(
+            'products.index',
+            [
+                'order' => 'asc',
+                'sort' => 'price'
+            ]
+        ))
+            ->assertJson([
+                'data' => [
+                    'products' => [
+                        'data' => [
+                            ['price' => 500],
+                            ['price' => 1000],
+                            ['price' => 2000],
+                            ['price' => 3000],
+                        ]
+                    ]
+                ]
+            ]);
+    }
 }

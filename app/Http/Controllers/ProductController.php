@@ -107,6 +107,17 @@ class ProductController extends Controller
                 !in_array($user?->role->slug, ['admin', 'manager']),
                 fn (Builder $query) => $query->where('active', true)
             )
+            ->when(
+                $request['sort'],
+                fn (Builder $query) => $query->orderBy(
+                    $request['sort'],
+                    $request['order'] ?? 'asc'
+                )
+            )
+            ->when(
+                !$request['sort'],
+                fn (Builder $query) => $query->latest('products.created_at')
+            )
             ->paginate($paginationCount);
 
         return response()->json([
