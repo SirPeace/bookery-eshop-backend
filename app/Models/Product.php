@@ -23,6 +23,11 @@ class Product extends Model
         'thumbnail_path',
     ];
 
+    /**
+     * Create default slug for the model on specified column
+     *
+     * @return array
+     */
     public function sluggable(): array
     {
         return [

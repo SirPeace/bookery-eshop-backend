@@ -37,7 +37,7 @@ class ProductFactory extends Factory
             'discount' => $discount,
             'title' => $this->faker->words(asText: true),
             'description' => $this->faker->paragraphs(asText: true),
-            'keywords' => $this->faker->words(10, asText: true),
+            'keywords' => json_encode($this->faker->words(10)),
         ];
     }
 }

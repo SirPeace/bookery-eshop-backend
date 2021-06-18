@@ -71,17 +71,44 @@ class ProductController extends Controller
                 $request['attribute'] && $request['attribute_value'],
                 fn (Builder $query) => $query
                     ->join(
-                        'categories',
-                        'products.category_id',
+                        'attribute_product',
+                        'products.id',
                         '=',
-                        'categories.id'
+                        'attribute_product.product_id'
                     )
                     ->join(
-                        'attribute_group_category',
-                        'categories.id',
+                        'attributes',
+                        'attributes.id',
                         '=',
-                        'attribute_group_category.category_id'
+                        'attribute_product.attribute_id'
                     )
+                    ->join(
+                        'attribute_groups',
+                        'attribute_groups.id',
+                        '=',
+                        'attributes.group_id'
+                    )
+                    ->where('attribute_groups.slug', $request['attribute'])
+                    ->where('attributes.value', $request['attribute_value'])
+            )
+            ->when(
+                !in_array($user?->role->slug, ['admin', 'manager']),
+                fn (Builder $query) => $query->where('active', true)
+            )
+            ->when(
+                $request['sort'],
+                fn (Builder $query) => $query->orderBy(
+                    "products.{$request['sort']}",
+                    $request['order'] ?? 'asc'
+                )
+            )
+            ->when(
+                !$request['sort'],
+                fn (Builder $query) => $query->latest('products.created_at')
+            )
+            ->when(
+                $search = $request['search'],
+                fn (Builder $query) => $query
                     ->join(
                         'attribute_product',
                         'products.id',
@@ -98,25 +125,18 @@ class ProductController extends Controller
                         'attribute_groups',
                         'attribute_groups.id',
                         '=',
-                        'attribute_group_category.attribute_group_id'
+                        'attributes.group_id'
                     )
-                    ->where('attribute_groups.slug', $request['attribute'])
-                    ->where('attributes.value', $request['attribute_value'])
-            )
-            ->when(
-                !in_array($user?->role->slug, ['admin', 'manager']),
-                fn (Builder $query) => $query->where('active', true)
-            )
-            ->when(
-                $request['sort'],
-                fn (Builder $query) => $query->orderBy(
-                    $request['sort'],
-                    $request['order'] ?? 'asc'
-                )
-            )
-            ->when(
-                !$request['sort'],
-                fn (Builder $query) => $query->latest('products.created_at')
+                    ->where('products.title', 'like', "%$search%")
+                    ->orWhere(function (Builder $query) use ($search) {
+                        $query->where('attributes.value', 'like', "%$search%")
+                            ->whereNotIn(
+                                'attribute_groups.slug',
+                                ['weight', 'language']
+                            );
+                    })
+                    ->orWhere('products.description', 'like', "%$search%")
+                    ->orWhere('products.keywords', 'like', "%$search%")
             )
             ->paginate($paginationCount);
 
