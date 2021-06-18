@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Models\Attribute;
 use App\Models\AttributeGroup;
+use App\Models\Order;
 use Illuminate\Http\Testing\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -25,7 +26,7 @@ class GetProductsTest extends TestCase
         $firstProduct->refresh();
         $lastProduct->refresh();
 
-        $this->get(route('products.index'))
+        $this->get(route('products.index', ['sort' => 'id']))
             ->assertJson([
                 'status' => 'success',
                 'data'   => [
@@ -79,7 +80,10 @@ class GetProductsTest extends TestCase
                 "slug" => $lastProduct->slug,
             ]);
 
-        $this->get(route('products.index', ['page' => 5]))
+        $this->get(route(
+            'products.index',
+            ['page' => 5, 'order' => 'asc', 'sort' => 'id']
+        ))
             ->assertJson([
                 "data" => [
                     "products" => [
@@ -148,7 +152,8 @@ class GetProductsTest extends TestCase
             'products.index',
             [
                 'min_price' => 1000,
-                'max_price' => 2000
+                'max_price' => 2000,
+                'sort'      => 'id'
             ]
         ))
             ->assertJsonCount(2, 'data.products.data')
@@ -208,7 +213,10 @@ class GetProductsTest extends TestCase
         $category->attribute_groups()->save($attrbuteGroup);
 
         $product = Product::factory()->create(['category_id' => $category->id]);
-        $attribute = Attribute::factory()->create(['value' => 'Oscar Hartmann']);
+        $attribute = Attribute::factory()->create([
+            'value' => 'Oscar Hartmann',
+            'group_id' => $attrbuteGroup->id
+        ]);
         $product->attributes()->save($attribute);
 
         $this->get(route(
@@ -268,10 +276,7 @@ class GetProductsTest extends TestCase
 
         $this->getJson(route(
             'products.index',
-            [
-                'order' => 'asc',
-                'sort' => 'price'
-            ]
+            ['sort' => 'price']
         ))
             ->assertJson([
                 'data' => [
@@ -286,4 +291,134 @@ class GetProductsTest extends TestCase
                 ]
             ]);
     }
+
+    /** @test */
+    public function products_can_be_sorted_by_title()
+    {
+        Product::factory()->createMany([
+            ['title' => 'Zelda'],
+            ['title' => 'Amazon Kindle'],
+            ['title' => 'Xiaomi Redmi'],
+            ['title' => 'Yandex.Music'],
+        ]);
+
+        $this->getJson(route(
+            'products.index',
+            ['sort' => 'title', 'order' => 'desc']
+        ))
+            ->assertJson([
+                'data' => [
+                    'products' => [
+                        'data' => [
+                            ['title' => 'Zelda'],
+                            ['title' => 'Yandex.Music'],
+                            ['title' => 'Xiaomi Redmi'],
+                            ['title' => 'Amazon Kindle'],
+                        ]
+                    ]
+                ]
+            ]);
+    }
+
+    /** @test */
+    public function products_can_be_sorted_by_popularity()
+    {
+        // Popularity is just a better term for orders count
+
+        $product = Product::factory()->create([
+            'title' => 'Zelda',
+        ]);
+        $order = Order::factory()->create();
+        $order->products()->attach($product, [
+            'product_count' => 2,
+            'product_old_price' => $product->old_price,
+            'product_price' => $product->price,
+            'product_discount' => $product->discount,
+            'product_title' => $product->title,
+        ]);
+
+
+        $product = Product::factory()->create([
+            'title' => 'Xiaomi Redmi',
+        ]);
+        $order = Order::factory()->create();
+        $order->products()->attach($product, [
+            'product_count' => 4,
+            'product_old_price' => $product->old_price,
+            'product_price' => $product->price,
+            'product_discount' => $product->discount,
+            'product_title' => $product->title,
+        ]);
+
+        $product = Product::factory()->create([
+            'title' => 'Amazon Kindle',
+        ]);
+        $order = Order::factory()->create();
+        $order->products()->attach($product, [
+            'product_count' => 3,
+            'product_old_price' => $product->old_price,
+            'product_price' => $product->price,
+            'product_discount' => $product->discount,
+            'product_title' => $product->title,
+        ]);
+
+        $this->getJson(route(
+            'products.index',
+            ['sort' => 'popularity', 'order' => 'desc']
+        ))
+            ->assertJson([
+                'data' => [
+                    'products' => [
+                        'data' => [
+                            ['title' => 'Xiaomi Redmi'],
+                            ['title' => 'Amazon Kindle'],
+                            ['title' => 'Zelda'],
+                        ]
+                    ]
+                ]
+            ]);
+    }
+
+    /** @test */
+    public function products_can_be_searched()
+    {
+        Product::factory(2)->create();
+
+        $attrbuteGroup = AttributeGroup::factory()->create(['slug' => 'author']);
+        $category = Category::factory()->create();
+        $category->attribute_groups()->save($attrbuteGroup);
+
+        $product = Product::factory()->create(['category_id' => $category->id]);
+        $attribute = Attribute::factory()->create([
+            'value' => 'Oscar Hartmann',
+            'group_id' => $attrbuteGroup->id
+        ]);
+        $product->attributes()->save($attribute);
+
+        $this->getJson(route('products.index', ['search' => 'Oscar']))
+            ->assertJsonCount(1, 'data.products.data')
+            ->assertJsonFragment([
+                'id' => $product->id,
+                'category_id' => $category->id,
+            ]);
+    }
+
+    // /** @test */
+    // public function errors_return_if_sorting_on_unknown_metric()
+    // {
+    //     Product::factory(2)->create();
+
+    //     $this->getJson(route('products.index', ['sort' => 'mystery']))
+    //         ->assertJson([
+    //             'status' => 'success',
+    //             'data' => [
+    //                 'products' => [
+    //                     'data' => []
+    //                 ]
+    //             ],
+    //             'errors' => [
+    //                 "Requested sort parameter 'mystery' is not supported."
+    //             ]
+    //         ]);
+    // }
 }
