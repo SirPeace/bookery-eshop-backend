@@ -19,9 +19,9 @@ class CreateOrderProduct extends Migration
                 ->constrained()
                 ->onDelete('set null');
             $table->string('product_title');
-            $table->unsignedDecimal('old_price');
-            $table->unsignedDecimal('price');
-            $table->unsignedInteger('discount');
+            $table->unsignedDecimal('product_old_price');
+            $table->unsignedDecimal('product_price');
+            $table->unsignedInteger('product_discount');
             $table->unsignedInteger('product_count')->default(1);
 
             $table->unique(['order_id', 'product_id']);
