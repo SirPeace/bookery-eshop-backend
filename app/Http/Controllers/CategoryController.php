@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CategoryStoreRequest;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Http\Requests\CategoryStoreRequest;
+use App\Http\Requests\CategoryUpdateRequest;
 
 class CategoryController extends Controller
 {
@@ -42,7 +43,9 @@ class CategoryController extends Controller
 
         return response()->json([
             "status" => "success",
-            "data" => $category
+            "data" => [
+                "category" => $category,
+            ]
         ]);
     }
 
@@ -60,13 +63,27 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \App\Http\Requests\CategoryUpdateRequest  $request
+     * @param  \App\Models\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(CategoryUpdateRequest $request, Category $category)
     {
-        //
+        $this->authorize('update', [Category::class, $category]);
+
+        $category->update($request->except('slug'));
+
+        // Invalid slug may end up being empty
+        if ($request['slug']) {
+            $category->update(['slug' => $request['slug']]);
+        }
+
+        return response()->json([
+            "status" => "success",
+            "data" => [
+                "category" => $category,
+            ]
+        ]);
     }
 
     /**

@@ -9,7 +9,7 @@ use App\Models\Category;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class CreateCategoriesTest extends TestCase
+class CreateCategoryTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
@@ -36,7 +36,9 @@ class CreateCategoriesTest extends TestCase
             ->postJson(route('categories.store'), $this->data)
             ->assertJson([
                 "status" => "success",
-                "data" => $this->data
+                "data" => [
+                    "category" => $this->data
+                ]
             ]);
 
         $this->assertDatabaseCount('categories', 1);
@@ -53,7 +55,9 @@ class CreateCategoriesTest extends TestCase
             ->postJson(route('categories.store'), $this->data)
             ->assertJson([
                 "status" => "success",
-                "data" => $this->data
+                "data" => [
+                    "category" => $this->data
+                ]
             ]);
 
         $this->assertDatabaseCount('categories', 2);
