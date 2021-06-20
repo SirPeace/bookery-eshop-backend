@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Actions\Fortify\CreateNewUser;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,4 +27,7 @@ Route::resource('products', ProductController::class)
     ->except(['create', 'edit']);
 
 Route::resource('orders', OrderController::class)
+    ->except(['create', 'edit']);
+
+Route::resource('categories', CategoryController::class)
     ->except(['create', 'edit']);

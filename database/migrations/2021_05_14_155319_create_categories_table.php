@@ -20,8 +20,8 @@ class CreateCategoriesTable extends Migration
                 ->constrained('categories');
             $table->string('slug')->unique();
             $table->string('title');
-            $table->text('keywords');
-            $table->text('description');
+            $table->text('keywords')->nullable();
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }
