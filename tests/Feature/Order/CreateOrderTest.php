@@ -124,16 +124,16 @@ class CreateOrderTest extends TestCase
         $this->assertDatabaseHas('order_product', [
             'product_id' => $productOne->id,
             'product_title' => 'Product one',
-            'old_price' => 500,
-            'price' => 450,
-            'discount' => 10,
+            'product_old_price' => 500,
+            'product_price' => 450,
+            'product_discount' => 10,
         ]);
         $this->assertDatabaseHas('order_product', [
             'product_id' => $productTwo->id,
             'product_title' => 'Product two',
-            'old_price' => 1000,
-            'price' => 750,
-            'discount' => 25,
+            'product_old_price' => 1000,
+            'product_price' => 750,
+            'product_discount' => 25,
             'product_count' => 2,
         ]);
 

@@ -26,9 +26,9 @@ class OrderTest extends TestCase
                 Product::factory()->count(3),
                 [
                     'product_title' => 'Random title',
-                    'old_price' => 1000,
-                    'price' => 800,
-                    'discount' => 20,
+                    'product_old_price' => 1000,
+                    'product_price' => 800,
+                    'product_discount' => 20,
                 ]
             )
             ->create();

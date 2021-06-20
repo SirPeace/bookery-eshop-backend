@@ -31,9 +31,9 @@ class GetOrdersTest extends TestCase
                 $product = Product::factory()->create(),
                 [
                     'product_title' => $product->title,
-                    'old_price' => $product->old_price,
-                    'price' => $product->price,
-                    'discount' => $product->discount,
+                    'product_old_price' => $product->old_price,
+                    'product_price' => $product->price,
+                    'product_discount' => $product->discount,
                     'product_count' => 1,
                 ]
             )
@@ -78,9 +78,9 @@ class GetOrdersTest extends TestCase
                 $product = Product::factory()->create(),
                 [
                     'product_title' => $product->title,
-                    'old_price' => $product->old_price,
-                    'price' => $product->price,
-                    'discount' => $product->discount,
+                    'product_old_price' => $product->old_price,
+                    'product_price' => $product->price,
+                    'product_discount' => $product->discount,
                     'product_count' => 1,
                 ]
             )
@@ -106,9 +106,9 @@ class GetOrdersTest extends TestCase
                 $product = Product::factory()->create(),
                 [
                     'product_title' => $product->title,
-                    'old_price' => $product->old_price,
-                    'price' => $product->price,
-                    'discount' => $product->discount,
+                    'product_old_price' => $product->old_price,
+                    'product_price' => $product->price,
+                    'product_discount' => $product->discount,
                     'product_count' => 1,
                 ]
             )

@@ -59,9 +59,9 @@ class OrderController extends Controller
                 'order_id' => $order->id,
                 'product_id' => $product->id,
                 'product_title' => $product->title,
-                'old_price' => $product->old_price,
-                'price' => $product->price,
-                'discount' => $product->discount,
+                'product_old_price' => $product->old_price,
+                'product_price' => $product->price,
+                'product_discount' => $product->discount,
                 'product_count' => $product->count,
             ]);
         }

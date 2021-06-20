@@ -124,7 +124,7 @@ class CreateProductTest extends TestCase
     {
         $this->actingAs(User::factory()->create())
             ->postJson(route('products.store'), $this->data)
-            ->assertStatus(422)
+            ->assertStatus(403)
             ->assertJson(['message' => 'This action is unauthorized.']);
 
         $this->assertDatabaseMissing('products', ['title' => 'Product Title']);
