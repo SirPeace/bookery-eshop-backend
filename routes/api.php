@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Actions\Fortify\CreateNewUser;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
@@ -31,3 +31,9 @@ Route::resource('orders', OrderController::class)
 
 Route::resource('categories', CategoryController::class)
     ->except(['create', 'edit']);
+
+Route::prefix('cart')->group(function () {
+    Route::get('/', [CartController::class, 'index'])->name('cart.index');
+    Route::patch('/', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/', [CartController::class, 'destroy'])->name('cart.destroy');
+});

@@ -44,11 +44,13 @@ class Cart
             return $this->products;
         }
 
-        $products = Product::whereIn('id', Redis::hkeys($this->hash))
-            ->get();
+        $products = Product::whereIn('id', Redis::hkeys($this->hash))->get();
 
         foreach ($products as $product) {
-            $product->count = Redis::hget($this->hash, $product->id);
+            $product->count = (int) Redis::hget($this->hash, $product->id);
+            $product->price = (float) $product->price;
+            $product->old_price = (float) $product->old_price;
+            $product->discount = (float) $product->discount;
         }
 
         $this->products = $products;
