@@ -14,19 +14,10 @@ class GetCartProductsTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->admin = User::factory()->create([
-            'role_id' => Role::factory()->create(['slug' => 'admin'])
-        ]);
-    }
-
     /** @test */
     public function get_cart_products()
     {
-        $this->actingAs($this->admin);
+        $this->actingAs(User::factory()->create());
 
         Product::factory()->create();
         [$productOne, $productTwo] = Product::factory(2)->create();
