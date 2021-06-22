@@ -41,4 +41,19 @@ class GetCategoriesTest extends TestCase
             ->assertJsonFragment($ebooksCategory->toArray())
             ->assertJsonFragment($paperBooksCategory->toArray());
     }
+
+    /** @test */
+    public function get_single_category()
+    {
+        $category = Category::factory()->create();
+
+        $this->getJson(route('categories.show', ['category' => $category->id]))
+            ->assertSuccessful()
+            ->assertJson([
+                "status" => "success",
+                "data" => [
+                    "category" => $category->toArray()
+                ]
+            ]);
+    }
 }
