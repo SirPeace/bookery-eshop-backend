@@ -59,7 +59,14 @@ class CartController extends Controller
      */
     public function removeProduct(Product $product, Request $request)
     {
-        //
+        $this->cart->removeProduct($product, $request['count'] ?: 1);
+
+        return response()->json([
+            "status" => "success",
+            "data" => [
+                "cart" => $this->cart->getProducts()
+            ]
+        ]);
     }
 
     /**

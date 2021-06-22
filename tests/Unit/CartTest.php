@@ -97,10 +97,9 @@ class CartTest extends TestCase
     {
         $user = User::factory()->create();
         $this->actingAs($user);
-        $cart = app(Cart::class);
-
         $product = Product::factory()->create();
         Redis::hset("cart:test:{$user->id}", $product->id, 1);
+        $cart = app(Cart::class);
 
         $cart->removeProduct($product);
 
@@ -112,10 +111,9 @@ class CartTest extends TestCase
     {
         $user = User::factory()->create();
         $this->actingAs($user);
-        $cart = app(Cart::class);
-
         $product = Product::factory()->create();
         Redis::hset("cart:test:{$user->id}", $product->id, 1);
+        $cart = app(Cart::class);
 
         $cart->removeProduct($product);
         $products = $cart->getProducts();

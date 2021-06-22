@@ -30,6 +30,8 @@ class Cart
         $this->hash = env('APP_ENV') === 'testing'
             ? "cart:test:{$this->user->id}"
             : "cart:{$this->user->id}";
+
+        $this->setupProducts();
     }
 
     /**
@@ -40,22 +42,7 @@ class Cart
      */
     public function getProducts(): Collection
     {
-        if (!empty($this->products)) {
-            return $this->products;
-        }
-
-        $products = Product::whereIn('id', Redis::hkeys($this->hash))->get();
-
-        foreach ($products as $product) {
-            $product->count = (int) Redis::hget($this->hash, $product->id);
-            $product->price = (float) $product->price;
-            $product->old_price = (float) $product->old_price;
-            $product->discount = (float) $product->discount;
-        }
-
-        $this->products = $products;
-
-        return $products;
+        return $this->products;
     }
 
     /**
@@ -73,10 +60,11 @@ class Cart
             : $quantity;
 
         $product->count = $productQuantity;
+        $product->price = (float) $product->price;
+        $product->old_price = (float) $product->old_price;
+        $product->discount = (float) $product->discount;
 
-        if (!empty($this->products)) {
-            $this->products[] = $product;
-        }
+        $this->products[] = $product;
 
         Redis::hset($this->hash, $product->id, $productQuantity);
     }
@@ -88,13 +76,22 @@ class Cart
      * @param int $quantity
      * @return void
      */
-    public function removeProduct(Product $product): void
+    public function removeProduct(Product $product, int $quantity = 1): void
     {
-        if (!empty($this->products)) {
-            $this->products->filter(fn ($item) => $item->id != $product->id);
+        $cartProduct = $this->products->find($product->id);
+        if (!$cartProduct) return;
+
+        if ($quantity >= $cartProduct->count) {
+            $this->products = $this->products->filter(
+                fn ($item) => $item->id != $product->id
+            );
+
+            Redis::hdel($this->hash, $product->id);
+            return;
         }
 
-        Redis::hdel($this->hash, $product->id);
+        $cartProduct->count -= $quantity;
+        Redis::hset($this->hash, $cartProduct->id, $cartProduct->count);
     }
 
     /**
@@ -125,5 +122,34 @@ class Cart
     public function getCart(): array
     {
         return Redis::hgetall($this->hash);
+    }
+
+    /**
+     * Sync cart instance with Redis hash
+     *
+     * @return void
+     */
+    public function refresh(): void
+    {
+        $this->setupProducts();
+    }
+
+    /**
+     * Load Redis hash in the products property as a collection of products
+     *
+     * @return void
+     */
+    private function setupProducts(): void
+    {
+        $products = Product::whereIn('id', Redis::hkeys($this->hash))->get();
+
+        foreach ($products as $product) {
+            $product->count = (int) Redis::hget($this->hash, $product->id);
+            $product->price = (float) $product->price;
+            $product->old_price = (float) $product->old_price;
+            $product->discount = (float) $product->discount;
+        }
+
+        $this->products = $products;
     }
 }

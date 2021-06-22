@@ -36,6 +36,8 @@ class AddProductToCartTest extends TestCase
             ->assertJsonFragment($product->toArray())
             ->assertJsonCount(2, 'data.cart');
 
+        $cart->refresh();
+
         $this->assertCount(2, $cart->getProducts());
     }
 
@@ -54,6 +56,8 @@ class AddProductToCartTest extends TestCase
             ['count' => 2]
         )
             ->assertSuccessful();
+
+        $cart->refresh();
 
         $this->assertEquals(
             2,
