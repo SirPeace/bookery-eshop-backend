@@ -34,6 +34,7 @@ Route::resource('categories', CategoryController::class)
 
 Route::prefix('cart')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('cart.index');
-    Route::patch('/', [CartController::class, 'update'])->name('cart.update');
+    Route::post('/{product}', [CartController::class, 'addProduct'])->name('cart.add_product');
+    Route::delete('/{product}', [CartController::class, 'removeProduct'])->name('cart.remove_product');
     Route::delete('/', [CartController::class, 'destroy'])->name('cart.destroy');
 });
