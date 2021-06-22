@@ -94,11 +94,17 @@ class CategoryController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  \App\Models\Category $category
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Category $category)
     {
-        //
+        $this->authorize('delete', [Category::class, $category]);
+
+        $category->delete();
+
+        return response()->json([
+            "status" => "success"
+        ]);
     }
 }
