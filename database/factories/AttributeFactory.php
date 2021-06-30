@@ -24,7 +24,7 @@ class AttributeFactory extends Factory
     {
         return [
             'group_id' => AttributeGroup::factory(),
-            'value'    => $this->faker->text(100),
+            'value'    => $this->faker->text(30),
         ];
     }
 }

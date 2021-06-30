@@ -26,7 +26,6 @@ class AttributeGroupFactory extends Factory
 
         return [
             'title'       => $title,
-            'slug'        => Str::slug($title),
             'description' => $this->faker->paragraphs(asText: true),
         ];
     }

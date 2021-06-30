@@ -6,6 +6,8 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\AttributeController;
+use App\Http\Controllers\AttributeGroupController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,15 +24,18 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::resource('products', ProductController::class)
-    ->scoped(['product' => 'slug'])
-    ->except(['create', 'edit']);
+Route::apiResource('products', ProductController::class)
+    ->scoped(['product' => 'slug']);
 
-Route::resource('orders', OrderController::class)
-    ->except(['create', 'edit']);
+Route::apiResource('orders', OrderController::class);
 
-Route::resource('categories', CategoryController::class)
-    ->except(['create', 'edit']);
+Route::apiResource('categories', CategoryController::class);
+
+Route::apiResource('attributes', AttributeController::class);
+
+Route::apiResource('attribute_groups', AttributeGroupController::class)
+    ->parameters(['attribute_groups' => 'group'])
+    ->scoped(['attribute_group' => 'slug']);
 
 Route::prefix('cart')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('cart.index');
