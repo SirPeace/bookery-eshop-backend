@@ -76,6 +76,10 @@ class CartController extends Controller
      */
     public function destroy()
     {
-        //
+        $this->cart->clear();
+
+        return response()->json([
+            "status" => "success"
+        ]);
     }
 }
