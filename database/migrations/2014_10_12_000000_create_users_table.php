@@ -15,7 +15,7 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            // default role is customer
+            // default role is customer, see RoleSeeder
             $table->foreignId('role_id')->default(1)->constrained();
             $table->string('name');
             $table->string('email')->unique();
