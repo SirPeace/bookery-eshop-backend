@@ -10,6 +10,11 @@ class Attribute extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'value',
+        'group_id'
+    ];
+
     public function group(): BelongsTo
     {
         return $this->belongsTo(AttributeGroup::class, 'group_id');

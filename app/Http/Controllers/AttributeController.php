@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Attribute;
 use Illuminate\Http\Request;
 use App\Models\AttributeGroup;
+use App\Http\Requests\AttributeStoreRequest;
 
 class AttributeController extends Controller
 {
@@ -29,12 +30,20 @@ class AttributeController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\AttributeStoreRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(AttributeStoreRequest $request)
     {
-        //
+        $this->authorize('create', Attribute::class);
+
+        $attribute = Attribute::create($request->validated());
+
+        return response()->json([
+            'data' => [
+                'attribute' => $attribute
+            ]
+        ]);
     }
 
     /**

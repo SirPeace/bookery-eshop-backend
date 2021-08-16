@@ -11,6 +11,12 @@ class AttributeGroup extends Model
 {
     use HasFactory, Sluggable;
 
+    protected $fillable = [
+        'title',
+        'slug',
+        'description'
+    ];
+
     /**
      * Create default slug for the model on specified column
      *

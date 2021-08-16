@@ -20,8 +20,16 @@ use App\Http\Controllers\AttributeGroupController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+
+    Route::apiResource('attributes', AttributeController::class)
+        ->only(['store', 'update']);
+
+    Route::apiResource('attribute_groups', AttributeGroupController::class)
+        ->only(['store', 'update']);
 });
 
 Route::apiResource('products', ProductController::class)
@@ -31,11 +39,13 @@ Route::apiResource('orders', OrderController::class);
 
 Route::apiResource('categories', CategoryController::class);
 
-Route::apiResource('attributes', AttributeController::class);
+Route::apiResource('attributes', AttributeController::class)
+    ->except(['store', 'update']);
 
 Route::apiResource('attribute_groups', AttributeGroupController::class)
     ->parameters(['attribute_groups' => 'group'])
-    ->scoped(['attribute_group' => 'slug']);
+    ->scoped(['attribute_group' => 'slug'])
+    ->except(['store', 'update']);
 
 Route::prefix('cart')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('cart.index');
