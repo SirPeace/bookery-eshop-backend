@@ -7,6 +7,18 @@ use Illuminate\Foundation\Http\FormRequest;
 class OrderStoreRequest extends FormRequest
 {
     /**
+     * Prepare the data for validation.
+     *
+     * @return void
+     */
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'user_id' => auth()->id()
+        ]);
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array
@@ -14,6 +26,7 @@ class OrderStoreRequest extends FormRequest
     public function rules()
     {
         return [
+            'user_id' => 'integer|exists:users,id',
             'status_id' => 'integer|exists:order_statuses,id',
             'customer_name' => 'required|string',
             'customer_email' => 'required|string|email',
