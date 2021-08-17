@@ -21,15 +21,12 @@ class CreateOrderTest extends TestCase
     {
         parent::setUp();
 
-        $this->admin = User::factory()->create([
-            'role_id' => Role::factory()->create(['slug' => 'admin'])
-        ]);
+        $this->user = User::factory()->create();
 
         $this->data = [
-            'user_id' => $this->admin->id,
             'status_id' => OrderStatus::factory()->create()->id,
-            'customer_name' => $this->admin->name,
-            'customer_email' => $this->admin->email,
+            'customer_name' => $this->user->name,
+            'customer_email' => $this->user->email,
             'customer_phone' => $this->faker->phoneNumber,
             'address' => $this->faker->address,
             'city' => $this->faker->city,
@@ -41,41 +38,85 @@ class CreateOrderTest extends TestCase
     /** @test */
     public function can_create_order()
     {
-        $user = User::factory()->create();
-        $this->actingAs($user);
+        $this->actingAs($this->user);
 
         $cart = new Cart();
+        $cart->clear();
+
         $cart->addProduct(Product::factory()->create());
 
         $this->postJson(route('orders.store'), $this->data)
             ->assertJson([
                 'status' => 'success',
                 'data' => [
-                    'order' => $this->data,
+                    'order' => [
+                        'user_id' => $this->user->id,
+                        'status_id' => $this->data['status_id'],
+                        'customer_name' => $this->data['customer_name'],
+                        'customer_email' => $this->data['customer_email'],
+                        'customer_phone' => $this->data['customer_phone'],
+                        'address' => $this->data['address'],
+                        'city' => $this->data['city'],
+                        'postcode' => $this->data['postcode'],
+                        'customer_note' => $this->data['customer_note'],
+                    ],
                 ]
             ]);
 
-        $this->assertDatabaseHas('orders', ['user_id' => $this->admin->id]);
+        $this->assertDatabaseHas('orders', ['user_id' => $this->user->id]);
     }
 
     /** @test */
     public function order_is_not_created_if_validation_fails()
     {
-        $invalidData = array_merge($this->data, ['customer_name' => '']);
+        $invalidData = [
+            'status_id' => -1,
+            'customer_name' => '',
+            'customer_email' => 'foo',
+            'customer_phone' => 'going',
+            'address' => '',
+            'city' => '',
+            'postcode' => '',
+            'customer_note' => false,
+            'customer_name' => '',
+        ];
 
-        $this->actingAs(User::factory()->create())
-            ->postJson(route('orders.store'), $invalidData)
+        $response = $this->actingAs($this->user)
+            ->postJson(route('orders.store'), $invalidData);
+
+        $response
             ->assertJson([
                 'message' => 'The given data was invalid.',
                 'errors' => [
+                    "status_id" => [
+                        "The selected status id is invalid."
+                    ],
                     "customer_name" => [
                         "The customer name field is required."
+                    ],
+                    "customer_email" => [
+                        "The customer email must be a valid email address."
+                    ],
+                    "customer_phone" => [
+                        "The customer phone format is invalid."
+                    ],
+                    "address" => [
+                        "The address field is required."
+                    ],
+                    "city" => [
+                        "The city field is required."
+                    ],
+                    "postcode" => [
+                        "The postcode field is required."
+                    ],
+                    "customer_note" => [
+                        "The customer note must be a string."
                     ]
                 ]
             ])
             ->assertStatus(422);
 
-        $this->assertDatabaseMissing('orders', ['user_id' => $this->admin->id]);
+        $this->assertDatabaseMissing('orders', ['user_id' => $this->user->id]);
     }
 
     /** @test */
@@ -97,9 +138,11 @@ class CreateOrderTest extends TestCase
     /** @test */
     public function cart_products_are_stored_in_database_if_order_is_created()
     {
-        $this->actingAs(User::factory()->create());
+        $this->actingAs($this->user);
 
         $cart = new Cart();
+        $cart->clear();
+
         [$productOne, $productTwo] = Product::factory()->createMany([
             [
                 'title' => 'Product one',
@@ -114,21 +157,24 @@ class CreateOrderTest extends TestCase
                 'discount' => 25,
             ]
         ]);
+
         $cart->addProduct($productOne);
         $cart->addProduct($productTwo, 2);
 
         $response = $this->postJson(route('orders.store'), $this->data)
-            ->assertSuccessful()
-            ->json();
+            ->assertSuccessful();
 
         $this->assertDatabaseHas('order_product', [
+            'order_id' => $response->json('data.order.id'),
             'product_id' => $productOne->id,
             'product_title' => 'Product one',
             'product_old_price' => 500,
             'product_price' => 450,
             'product_discount' => 10,
+            'product_count' => 1,
         ]);
         $this->assertDatabaseHas('order_product', [
+            'order_id' => $response->json('data.order.id'),
             'product_id' => $productTwo->id,
             'product_title' => 'Product two',
             'product_old_price' => 1000,
