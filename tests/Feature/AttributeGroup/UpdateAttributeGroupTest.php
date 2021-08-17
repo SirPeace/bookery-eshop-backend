@@ -32,7 +32,7 @@ class UpdateAttributeGroupTest extends TestCase
     }
 
     /** @test */
-    public function unauthorized_user_cannot_create_attribute_group()
+    public function unauthorized_user_cannot_update_attribute_group()
     {
         $guest = User::factory()->create();
 
