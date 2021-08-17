@@ -6,6 +6,7 @@ use App\Models\Attribute;
 use Illuminate\Http\Request;
 use App\Models\AttributeGroup;
 use App\Http\Requests\AttributeStoreRequest;
+use App\Http\Requests\AttributeUpdateRequest;
 
 class AttributeController extends Controller
 {
@@ -65,13 +66,24 @@ class AttributeController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\AttributeUpdateRequest  $request
      * @param  \App\Models\Attribute  $attribute
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Attribute $attribute)
+    public function update(AttributeUpdateRequest $request, Attribute $attribute)
     {
-        //
+        $this->authorize('update', $attribute);
+
+        $attribute->update($request->validated());
+
+        return response()->json(
+            [
+                'status' => 'success',
+                'data' => [
+                    'attribute' => $attribute->refresh()
+                ]
+            ]
+        );
     }
 
     /**
