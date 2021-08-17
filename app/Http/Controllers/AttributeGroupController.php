@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\AttributeGroup;
 use App\Http\Requests\AttributeGroupStoreRequest;
+use App\Http\Requests\AttributeGroupUpdateRequest;
 
 class AttributeGroupController extends Controller
 {
@@ -64,13 +65,24 @@ class AttributeGroupController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\AttributeGroupUpdateRequest  $request
      * @param  \App\Models\AttributeGroup  $attributeGroup
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, AttributeGroup $group)
+    public function update(AttributeGroupUpdateRequest $request, AttributeGroup $attributeGroup)
     {
-        //
+        $this->authorize('update', $attributeGroup);
+
+        $attributeGroup->update($request->validated());
+
+        $attributeGroup->refresh();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'attribute_group' => $attributeGroup
+            ]
+        ]);
     }
 
     /**
