@@ -55,15 +55,16 @@ class OrderController extends Controller
         $order = Order::create($request->validated());
 
         foreach ($cart->getProducts() as $product) {
-            DB::table('order_product')->insert([
-                'order_id' => $order->id,
-                'product_id' => $product->id,
-                'product_title' => $product->title,
-                'product_old_price' => $product->old_price,
-                'product_price' => $product->price,
-                'product_discount' => $product->discount,
-                'product_count' => $product->count,
-            ]);
+            $product->orders()->attach(
+                $order,
+                [
+                    'product_title' => $product->title,
+                    'product_old_price' => $product->old_price,
+                    'product_price' => $product->price,
+                    'product_discount' => $product->discount,
+                    'product_count' => $product->count,
+                ]
+            );
         }
 
         return response()->json([
