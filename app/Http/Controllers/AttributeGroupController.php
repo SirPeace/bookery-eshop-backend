@@ -69,18 +69,18 @@ class AttributeGroupController extends Controller
      * @param  \App\Models\AttributeGroup  $attributeGroup
      * @return \Illuminate\Http\Response
      */
-    public function update(AttributeGroupUpdateRequest $request, AttributeGroup $attributeGroup)
+    public function update(AttributeGroupUpdateRequest $request, AttributeGroup $group)
     {
-        $this->authorize('update', $attributeGroup);
+        $this->authorize('update', $group);
 
-        $attributeGroup->update($request->validated());
+        $group->update($request->validated());
 
-        $attributeGroup->refresh();
+        $group->refresh();
 
         return response()->json([
             'status' => 'success',
             'data' => [
-                'attribute_group' => $attributeGroup
+                'attribute_group' => $group
             ]
         ]);
     }

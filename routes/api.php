@@ -29,6 +29,7 @@ Route::middleware('auth:sanctum')->group(function () {
         ->only(['store', 'update']);
 
     Route::apiResource('attribute_groups', AttributeGroupController::class)
+        ->parameters(['attribute_groups' => 'group'])
         ->only(['store', 'update']);
 });
 

@@ -37,7 +37,7 @@ class UpdateAttributeGroupTest extends TestCase
         $guest = User::factory()->create();
 
         $this->patchJson(
-            route('attribute_groups.update', ['attribute_group' => $this->attributeGroup]),
+            route('attribute_groups.update', ['group' => $this->attributeGroup]),
             $this->data
         )
             ->assertStatus(401)
@@ -45,7 +45,7 @@ class UpdateAttributeGroupTest extends TestCase
 
         $this->actingAs($guest)
             ->patchJson(
-                route('attribute_groups.update', ['attribute_group' => $this->attributeGroup]),
+                route('attribute_groups.update', ['group' => $this->attributeGroup]),
                 $this->data
             )
             ->assertStatus(403)
@@ -57,7 +57,7 @@ class UpdateAttributeGroupTest extends TestCase
     {
         $response = $this->actingAs($this->manager)
             ->patchJson(
-                route('attribute_groups.update', ['attribute_group' => $this->attributeGroup]),
+                route('attribute_groups.update', ['group' => $this->attributeGroup]),
                 [
                     'title' => '',
                     'description' => 0,
@@ -87,7 +87,7 @@ class UpdateAttributeGroupTest extends TestCase
     {
         $response = $this->actingAs($this->manager)
             ->patchJson(
-                route('attribute_groups.update', ['attribute_group' => $this->attributeGroup]),
+                route('attribute_groups.update', ['group' => $this->attributeGroup]),
                 $this->data
             );
 
