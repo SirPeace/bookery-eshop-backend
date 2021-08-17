@@ -8,6 +8,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\AttributeGroupController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,9 +22,7 @@ use App\Http\Controllers\AttributeGroupController;
 */
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
+    Route::get('/user', [UserController::class, 'me'])->name('me');
 
     Route::apiResource('attributes', AttributeController::class)
         ->only(['store', 'update', 'destroy']);
@@ -55,3 +54,5 @@ Route::prefix('cart')->group(function () {
     Route::delete('/{product}', [CartController::class, 'removeProduct'])->name('cart.remove_product');
     Route::delete('/', [CartController::class, 'destroy'])->name('cart.destroy');
 });
+
+Route::apiResource('users', UserController::class);

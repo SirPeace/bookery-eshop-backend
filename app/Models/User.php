@@ -33,6 +33,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $hidden = [
         'password',
         'remember_token',
+        'email'
     ];
 
     /**
@@ -52,5 +53,14 @@ class User extends Authenticatable implements MustVerifyEmail
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function toArray()
+    {
+        $arr = parent::toArray();
+
+        $arr['avatar_url'] = $this->avatar_url;
+
+        return $arr;
     }
 }
