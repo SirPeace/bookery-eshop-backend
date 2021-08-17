@@ -52,7 +52,7 @@ class OrderController extends Controller
             throw new EmptyCartException("Can't create order with empty cart");
         }
 
-        $order = Order::create($request->all());
+        $order = Order::create($request->validated());
 
         foreach ($cart->getProducts() as $product) {
             DB::table('order_product')->insert([
@@ -99,7 +99,7 @@ class OrderController extends Controller
      */
     public function update(OrderUpdateRequest $request, Order $order)
     {
-        $order->update($request->all());
+        $order->update($request->validated());
 
         return response()->json([
             'status' => 'success',
