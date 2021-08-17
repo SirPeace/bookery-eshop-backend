@@ -94,6 +94,14 @@ class AttributeController extends Controller
      */
     public function destroy(Attribute $attribute)
     {
-        //
+        $this->authorize('delete', $attribute);
+
+        $attribute->delete();
+
+        return response()->json(
+            [
+                'status' => 'success'
+            ]
+        );
     }
 }
