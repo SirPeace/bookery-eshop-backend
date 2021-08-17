@@ -3,18 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Cart;
-use App\Models\User;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
-    public Cart $cart;
-
-    public function __construct()
-    {
-        $this->cart = new Cart();
-    }
+    public function __construct(
+        public Cart $cart
+    ) {}
 
     /**
      * Display a listing of products in the cart.
