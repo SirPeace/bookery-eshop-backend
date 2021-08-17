@@ -65,20 +65,21 @@ class UpdateAttributeGroupTest extends TestCase
                 ]
             );
 
-        $response->assertJson([
-            'message' => 'The given data was invalid.',
-            'errors' => [
-                'title' => [
-                    'The title must be a string.'
-                ],
-                "description" => [
-                    "The description must be a string."
-                ],
-                'slug' => [
-                    'The slug has already been taken.'
-                ],
-            ]
-        ]);
+        $response->assertStatus(422)
+            ->assertJson([
+                'message' => 'The given data was invalid.',
+                'errors' => [
+                    'title' => [
+                        'The title must be a string.'
+                    ],
+                    "description" => [
+                        "The description must be a string."
+                    ],
+                    'slug' => [
+                        'The slug has already been taken.'
+                    ],
+                ]
+            ]);
     }
 
     /** @test */
