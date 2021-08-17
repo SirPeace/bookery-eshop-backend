@@ -26,11 +26,12 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::apiResource('attributes', AttributeController::class)
-        ->only(['store', 'update']);
+        ->only(['store', 'update', 'destroy']);
 
     Route::apiResource('attribute_groups', AttributeGroupController::class)
         ->parameters(['attribute_groups' => 'group'])
-        ->only(['store', 'update']);
+        ->scoped(['attribute_group' => 'slug'])
+        ->only(['store', 'update', 'destroy']);
 });
 
 Route::apiResource('products', ProductController::class)
@@ -41,12 +42,12 @@ Route::apiResource('orders', OrderController::class);
 Route::apiResource('categories', CategoryController::class);
 
 Route::apiResource('attributes', AttributeController::class)
-    ->except(['store', 'update']);
+    ->except(['store', 'update', 'destroy']);
 
 Route::apiResource('attribute_groups', AttributeGroupController::class)
     ->parameters(['attribute_groups' => 'group'])
     ->scoped(['attribute_group' => 'slug'])
-    ->except(['store', 'update']);
+    ->except(['store', 'update', 'destroy']);
 
 Route::prefix('cart')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('cart.index');

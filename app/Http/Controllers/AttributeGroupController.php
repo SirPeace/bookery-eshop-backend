@@ -93,6 +93,14 @@ class AttributeGroupController extends Controller
      */
     public function destroy(AttributeGroup $group)
     {
-        //
+        $this->authorize('delete', $group);
+
+        $group->delete();
+
+        return response()->json(
+            [
+                'status' => 'success'
+            ]
+        );
     }
 }
